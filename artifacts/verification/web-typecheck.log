@@ -1,0 +1,2 @@
+﻿npm notice run kulvar-web@0.1.0 typecheck
+npm notice run node node_modules/typescript/bin/tsc -b

@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Kulvar.Api/Kulvar.Api.csproj" />
+    <Project Path="src/Kulvar.Platform/Kulvar.Platform.csproj" />
+    <Project Path="src/Kulvar.Modules.Identity/Kulvar.Modules.Identity.csproj" />
+    <Project Path="src/Kulvar.Modules.Tenancy/Kulvar.Modules.Tenancy.csproj" />
+    <Project Path="src/Kulvar.Modules.Customers/Kulvar.Modules.Customers.csproj" />
+    <Project Path="src/Kulvar.Modules.Support/Kulvar.Modules.Support.csproj" />
+    <Project Path="src/Kulvar.Modules.Billing/Kulvar.Modules.Billing.csproj" />
+    <Project Path="src/Kulvar.Modules.Operations/Kulvar.Modules.Operations.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Kulvar.Testing/Kulvar.Testing.csproj" />
+    <Project Path="tests/Kulvar.UnitTests/Kulvar.UnitTests.csproj" />
+    <Project Path="tests/Kulvar.IntegrationTests/Kulvar.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,9 @@
+﻿Testler çalıştırılıyor: D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\tests\Kulvar.IntegrationTests\bin\Release\net10.0\Kulvar.IntegrationTests.dll (net10.0|x64)
+D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\tests\Kulvar.IntegrationTests\bin\Release\net10.0\Kulvar.IntegrationTests.dll (net10.0|x64) başarılı (1m 02s 811ms)
+
+Test çalıştırması özeti: Başarılı!
+  toplam: 212
+  başarısız oldu: 0
+  başarılı: 212
+  atlandı: 0
+  süre: 1m 05s 066ms

@@ -1,0 +1,7 @@
+# Test projeleri: okunabilir test adları (alt çizgi) xUnit geleneğidir.
+[*.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1515.severity = none
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA1861.severity = none# Test yardımcıları varsayılan CancellationToken kullanır; test iptali bu projede kullanılmıyor.
+dotnet_diagnostic.xUnit1051.severity = none

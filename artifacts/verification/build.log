@@ -1,0 +1,17 @@
+﻿  Kulvar.Testing -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\tests\Kulvar.Testing\bin\Release\net10.0\Kulvar.Testing.dll
+  Kulvar.Platform -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\src\Kulvar.Platform\bin\Release\net10.0\Kulvar.Platform.dll
+  Kulvar.Modules.Billing -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\src\Kulvar.Modules.Billing\bin\Release\net10.0\Kulvar.Modules.Billing.dll
+  Kulvar.Modules.Identity -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\src\Kulvar.Modules.Identity\bin\Release\net10.0\Kulvar.Modules.Identity.dll
+  Kulvar.Modules.Customers -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\src\Kulvar.Modules.Customers\bin\Release\net10.0\Kulvar.Modules.Customers.dll
+  Kulvar.Modules.Tenancy -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\src\Kulvar.Modules.Tenancy\bin\Release\net10.0\Kulvar.Modules.Tenancy.dll
+  Kulvar.Modules.Support -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\src\Kulvar.Modules.Support\bin\Release\net10.0\Kulvar.Modules.Support.dll
+  Kulvar.Modules.Operations -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\src\Kulvar.Modules.Operations\bin\Release\net10.0\Kulvar.Modules.Operations.dll
+  Kulvar.Api -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\src\Kulvar.Api\bin\Release\net10.0\Kulvar.Api.dll
+  Kulvar.UnitTests -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\tests\Kulvar.UnitTests\bin\Release\net10.0\Kulvar.UnitTests.dll
+  Kulvar.IntegrationTests -> D:\Multi-Tenant SaaS Platform\multi-tenant-saas-platform\tests\Kulvar.IntegrationTests\bin\Release\net10.0\Kulvar.IntegrationTests.dll
+
+Oluşturma başarılı oldu.
+    0 Uyarı
+    0 Hata
+
+Geçen Süre 00:00:01.79

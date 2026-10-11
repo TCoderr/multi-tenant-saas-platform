@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Kulvar.Modules.Support</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kulvar.Platform\Kulvar.Platform.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Customers\Kulvar.Modules.Customers.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Tenancy\Kulvar.Modules.Tenancy.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Kulvar.UnitTests" />
+    <InternalsVisibleTo Include="Kulvar.IntegrationTests" />
+  </ItemGroup>
+</Project>

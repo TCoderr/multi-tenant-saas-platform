@@ -1,0 +1,10 @@
+# depo taraması 2026-10-10T21:28:12Z parmak izi: b30967daa618d93e files=210 taranan dosya: 311
+yasak dosya (sır/sertifika/.env/.local): 0
+sır deseni bulgusu: 0 (istisna dosyası: 2, yalnız test altyapısı)
+ayrılmış olmayan alan adında e-posta: 0
+otomatik araç imzası / ortak yazar satırı: 0; izinli olgu belgeleri dışında araç adı: 0
+paket sahipliği TCoderr (NuGet + npm meta verisi): True
+git: commit=0 remote=0 depo-yerel kimlik ayarı=0
+NuGet zafiyet denetimi (doğrudan + geçişli): exit=0 zafiyetli paket satırı=0
+npm audit (üretim + geliştirme bağımlılıkları, eşik: low): exit=0
+bulgu: 0

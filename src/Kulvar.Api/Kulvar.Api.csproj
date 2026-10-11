@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>Kulvar.Api</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Kulvar.IntegrationTests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kulvar.Platform\Kulvar.Platform.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Identity\Kulvar.Modules.Identity.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Tenancy\Kulvar.Modules.Tenancy.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Customers\Kulvar.Modules.Customers.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Support\Kulvar.Modules.Support.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Billing\Kulvar.Modules.Billing.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Operations\Kulvar.Modules.Operations.csproj" />
+  </ItemGroup>
+</Project>

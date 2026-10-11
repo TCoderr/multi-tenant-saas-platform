@@ -1,0 +1,187 @@
+# Kulvar yerel yığını: PostgreSQL 18 + tek seferlik migrator + HTTPS API + worker (+ isteğe bağlı demo seed).
+# Hazırlık ve çalıştırma: scripts/local-stack.ps1 | .sh (secret'ları ve sertifikayı KULVAR_LOCAL_DIR altına üretir; repoya girmez).
+# İzole koşu: farklı proje adı (-p), KULVAR_LOCAL_DIR ve KULVAR_HTTPS_PORT; volume'lar proje adıyla ön eklenir.
+
+x-app-hardening: &hardening
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  postgres:
+    image: postgres:18.6
+    environment:
+      POSTGRES_DB: kulvar
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_superuser_password
+      KULVAR_OWNER_PASSWORD_FILE: /run/secrets/kulvar_owner_password
+      KULVAR_APP_PASSWORD_FILE: /run/secrets/kulvar_app_password
+      KULVAR_PLATFORM_PASSWORD_FILE: /run/secrets/kulvar_platform_password
+      KULVAR_WORKER_PASSWORD_FILE: /run/secrets/kulvar_worker_password
+    secrets:
+      - postgres_superuser_password
+      - kulvar_owner_password
+      - kulvar_app_password
+      - kulvar_platform_password
+      - kulvar_worker_password
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
+      - ./db/bootstrap:/kulvar-bootstrap:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d kulvar -h 127.0.0.1"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kulvar:local
+    command: ["--migrate"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${KULVAR_ENVIRONMENT:-Development}
+      DOTNET_ENVIRONMENT: ${KULVAR_ENVIRONMENT:-Development}
+    secrets:
+      - source: migrator_connection
+        target: ConnectionStrings__KulvarMigrator
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    <<: *hardening
+
+  api:
+    image: kulvar:local
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${KULVAR_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: https://+:8843
+      Kestrel__Certificates__Default__Path: /https/kulvar-dev.pfx
+      DataProtection__KeysPath: /var/lib/kulvar/dataprotection
+      Exports__Root: /var/lib/kulvar/exports
+      # Simüle ödeme sonucunu seçme ve sağlayıcı olayı tetikleme: açık opt-in; yalnız Development'ta kabul edilir.
+      Billing__Simulation__Enabled: ${KULVAR_SIMULATION:-false}
+      Billing__Simulation__AllowOutcomeSelection: ${KULVAR_SIMULATION:-false}
+      # IP başına hız sınırları (istek/dk). Varsayılanlar üretim benzeridir; tarayıcı E2E koşusu tek IP'den çok sayıda giriş yaptığı için
+      # yalnız o izole yığında yükseltilir (scripts/e2e.ps1).
+      RateLimits__LoginPerMinute: ${KULVAR_LOGIN_LIMIT:-20}
+      RateLimits__SignupPerMinute: ${KULVAR_SIGNUP_LIMIT:-5}
+    secrets:
+      - source: app_connection
+        target: ConnectionStrings__KulvarApp
+      - source: platform_connection
+        target: ConnectionStrings__KulvarPlatform
+      - source: webhook_secret
+        target: Billing__Webhook__Secret
+      - source: https_certificate_password
+        target: Kestrel__Certificates__Default__Password
+    volumes:
+      - dpkeys:/var/lib/kulvar/dataprotection
+      - exports:/var/lib/kulvar/exports
+      - ${KULVAR_LOCAL_DIR:-./.local}/certs:/https:ro
+    ports:
+      - "127.0.0.1:${KULVAR_HTTPS_PORT:-8843}:8843"
+    healthcheck:
+      test: ["CMD", "dotnet", "/app/Kulvar.Api.dll", "--probe", "https://localhost:8843/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    <<: *hardening
+
+  worker:
+    image: kulvar:local
+    command: ["--worker"]
+    environment:
+      DOTNET_ENVIRONMENT: ${KULVAR_ENVIRONMENT:-Development}
+      Exports__Root: /var/lib/kulvar/exports
+      Billing__Simulation__Enabled: ${KULVAR_SIMULATION:-false}
+      Billing__Simulation__WebhookUrl: https://api:8843/api/webhooks/billing
+    secrets:
+      - source: worker_connection
+        target: ConnectionStrings__KulvarWorker
+      - source: webhook_secret
+        target: Billing__Webhook__Secret
+    volumes:
+      - exports:/var/lib/kulvar/exports
+    healthcheck:
+      # Worker'ın HTTP ucu yoktur; son başarılı iş turunun zaman damgasına bakılır.
+      test: ["CMD", "dotnet", "/app/Kulvar.Api.dll", "--worker-heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    <<: *hardening
+
+  # Demo verisi: yalnız açıkça çalıştırılır (profil "seed"). API'nin kendi uçlarını kullanır; parolalar yerel özel dosyalardan gelir.
+  seed:
+    image: kulvar:local
+    profiles: ["seed"]
+    command: ["--seed"]
+    environment:
+      DOTNET_ENVIRONMENT: Development
+      Seed__Enabled: "true"
+      Seed__BaseUrl: https://api:8843
+    secrets:
+      - source: migrator_connection
+        target: ConnectionStrings__KulvarMigrator
+    volumes:
+      - ${KULVAR_LOCAL_DIR:-./.local}/seed:/run/kulvar-seed:ro
+    depends_on:
+      api:
+        condition: service_healthy
+      worker:
+        condition: service_healthy
+    restart: "no"
+    <<: *hardening
+
+# Etiket, yıkıcı "reset" hedefinin yalnız bu ürünün volume'larını silmesini sağlar (scripts/local-stack: etiket yoksa silmez).
+volumes:
+  pgdata:
+    labels:
+      dev.kulvar.stack: "true"
+  dpkeys:
+    labels:
+      dev.kulvar.stack: "true"
+  exports:
+    labels:
+      dev.kulvar.stack: "true"
+
+secrets:
+  postgres_superuser_password:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/postgres_superuser_password
+  kulvar_owner_password:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/kulvar_owner_password
+  kulvar_app_password:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/kulvar_app_password
+  kulvar_platform_password:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/kulvar_platform_password
+  kulvar_worker_password:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/kulvar_worker_password
+  migrator_connection:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/migrator_connection
+  app_connection:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/app_connection
+  platform_connection:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/platform_connection
+  worker_connection:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/worker_connection
+  webhook_secret:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/webhook_secret
+  https_certificate_password:
+    file: ${KULVAR_LOCAL_DIR:-./.local}/secrets/https_certificate_password

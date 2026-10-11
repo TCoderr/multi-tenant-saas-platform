@@ -1,0 +1,35 @@
+# Yığın duman testi: 33 kontrol, 0 başarısız, süre 141 sn
+# tarih: 2026-10-10T21:22:14Z proje=kulvar-smoke port=8853
+PASS	Boş yığın ayağa kalktı ve seed tamamlandı	
+PASS	GET /health/live = 200	
+PASS	GET /health/ready = 200	
+PASS	SPA aynı origin'den sunuluyor	
+PASS	Gömülü yazı tipinin lisans metni uygulamayla sunuluyor	
+PASS	Oturumsuz /api/me = 401 problem+json	
+PASS	Güvenlik başlıkları (CSP, nosniff, HSTS)	
+PASS	Demo Owner girişi (seed parolası özel dosyadan)	
+PASS	Demo şirketi üyeliklerde görünüyor	
+PASS	Platform operatörü kurulum komutuyla atanmış	
+PASS	Seed yinelenebilir (ikinci koşu satır eklemedi)	kullanıcı:şirket:üyelik:operatör = 8:2:8:1
+PASS	Yeniden başlatma sonrası veri duruyor	
+PASS	Yeniden başlatma sonrası giriş çalışıyor	
+PASS	Oturum cookie'si yeniden başlatmadan sonra da çözülüyor (Data Protection anahtarları kalıcı)	
+PASS	DB kapalı: /health/ready = 503	
+PASS	DB kapalı: /health/live = 200	
+PASS	DB kapalı: oturumlu istek 503 (200 değil)	
+PASS	DB kapalı: giriş 503 (200/401 değil)	
+PASS	DB açıldı: /health/ready = 200	
+PASS	DB açıldı: giriş yeniden çalışıyor	
+PASS	DB açıldı: veri duruyor	
+PASS	api root değil, kök dosya sistemi salt-okunur, yetenekler bırakılmış	uid=1654 1654|true|[ALL]|[no-new-privileges:true]
+PASS	worker root değil, kök dosya sistemi salt-okunur, yetenekler bırakılmış	uid=1654 1654|true|[ALL]|[no-new-privileges:true]
+PASS	Worker sağlıklı (heartbeat)	healthy
+PASS	İmajda sır/sertifika/demo parolası dosyası yok; build geçmişinde sır yok	dosya=0 kontrol=1
+PASS	Runtime rolleri superuser/BYPASSRLS değil	kulvar_app=false/false,kulvar_owner=false/false,kulvar_platform=false/false,kulvar_worker=false/false
+PASS	API yalnız 127.0.0.1'de yayımlanıyor	127.0.0.1:8853
+PASS	PostgreSQL portu dışarı açılmamış	
+PASS	reset: etiketsiz (yabancı) volume silinmedi	
+PASS	reset: onaysız çağrı hiçbir şey silmedi	
+PASS	Başka projelerin volume'ları değişmedi	loca_keys, loca_pgdata, lst_dpkeys, lst_pgdata
+PASS	Başka projelerin çalışan container'ları değişmedi	loca-api-1, loca-postgres-1, lst-api-1, lst-postgres-1
+PASS	Duman yığını temizlendi (container/volume kalmadı)	

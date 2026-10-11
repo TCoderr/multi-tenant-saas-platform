@@ -1,0 +1,17 @@
+﻿  Geri yüklenecek projeler belirleniyor...
+  Geri yükleme için tüm projeler güncel.
+
+Şu kaynaklar kullanıldı:
+   https://api.nuget.org/v3/index.json
+
+Belirtilen `Kulvar.Api` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.Modules.Billing` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.Modules.Customers` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.Modules.Identity` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.Modules.Operations` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.Modules.Support` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.Modules.Tenancy` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.Platform` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.IntegrationTests` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.Testing` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.
+Belirtilen `Kulvar.UnitTests` projesinin geçerli kaynaklarda güvenlik açığı olan paketi yok.

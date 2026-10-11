@@ -1,0 +1,30 @@
+# Derleme çıktıları
+bin/
+obj/
+TestResults/
+*.user
+.vs/
+.idea/
+
+# Web
+node_modules/
+src/web/dist/
+src/web/test-results/
+src/web/playwright-report/
+src/web/.vite/
+*.tsbuildinfo
+
+# Yerel sırlar, sertifikalar, demo parolaları, export dosyaları (asla repoya girmez)
+.local/
+.local-*/
+*.pfx
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+
+# Doğrulama artefaktları: maskeli özetler repoda, ham/özel çıktılar değil
+artifacts/verification/private/
+artifacts/verification/**/*.trx
+artifacts/verification/**/raw-*.log

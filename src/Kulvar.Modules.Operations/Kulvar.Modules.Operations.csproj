@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Kulvar.Modules.Operations</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Kulvar.Platform\Kulvar.Platform.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Identity\Kulvar.Modules.Identity.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Tenancy\Kulvar.Modules.Tenancy.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Customers\Kulvar.Modules.Customers.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Support\Kulvar.Modules.Support.csproj" />
+    <ProjectReference Include="..\Kulvar.Modules.Billing\Kulvar.Modules.Billing.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Kulvar.UnitTests" />
+    <InternalsVisibleTo Include="Kulvar.IntegrationTests" />
+  </ItemGroup>
+</Project>

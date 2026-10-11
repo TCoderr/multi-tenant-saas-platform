@@ -1,0 +1,32 @@
+﻿npm notice run kulvar-web@0.1.0 build
+npm notice run node node_modules/typescript/bin/tsc -b && node node_modules/vite/bin/vite.js build
+vite v8.3.4 building client environment for production...
+transforming...
+✓ 99 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                            0.65 kB │ gzip:   0.39 kB
+dist/assets/ibm-plex-sans-condensed-latin-ext-500-normal-C9nn0g37.woff    13.86 kB
+dist/assets/ibm-plex-sans-condensed-latin-ext-600-normal-DvCwRnqE.woff    13.99 kB
+dist/assets/ibm-plex-sans-latin-ext-400-normal-RBey6euL.woff              14.36 kB
+dist/assets/ibm-plex-sans-latin-ext-500-normal-D0aIdm-b.woff              14.73 kB
+dist/assets/ibm-plex-sans-latin-ext-600-normal-DIrixKbi.woff              14.77 kB
+dist/assets/ibm-plex-sans-condensed-latin-ext-500-normal--oYb3bSD.woff2   15.92 kB
+dist/assets/ibm-plex-sans-latin-ext-400-normal-C5H60-Va.woff2             15.98 kB
+dist/assets/ibm-plex-sans-condensed-latin-ext-600-normal-CBdNZ9Ci.woff2   16.04 kB
+dist/assets/ibm-plex-sans-latin-ext-600-normal-DOrvGEcy.woff2             16.44 kB
+dist/assets/ibm-plex-sans-latin-ext-500-normal-DakdToA3.woff2             16.45 kB
+dist/assets/ibm-plex-sans-condensed-latin-600-normal-6XnkKYvF.woff        18.75 kB
+dist/assets/ibm-plex-sans-condensed-latin-500-normal-BLe87hIu.woff        18.78 kB
+dist/assets/ibm-plex-sans-condensed-latin-600-normal-CRd5VyFf.woff2       19.81 kB
+dist/assets/ibm-plex-sans-condensed-latin-500-normal-BqaLkUoX.woff2       19.95 kB
+dist/assets/ibm-plex-sans-latin-400-normal-CYLoc0-x.woff                  22.10 kB
+dist/assets/ibm-plex-sans-latin-400-normal-CDDApCn2.woff2                 22.58 kB
+dist/assets/ibm-plex-sans-latin-600-normal-Cu4Hd6ag.woff                  23.87 kB
+dist/assets/ibm-plex-sans-latin-500-normal-BgVn5rGT.woff                  23.91 kB
+dist/assets/ibm-plex-sans-latin-500-normal-6ng42L7E.woff2                 24.18 kB
+dist/assets/ibm-plex-sans-latin-600-normal-CuJfVYMP.woff2                 24.25 kB
+dist/assets/index-DWVfuxXK.css                                            18.44 kB │ gzip:   4.20 kB
+dist/assets/index-bkXsUZpD.js                                            423.57 kB │ gzip: 124.07 kB
+
+✓ built in 1.03s

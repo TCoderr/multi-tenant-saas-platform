@@ -1,0 +1,100 @@
+# Kulvar CI. Not: bu iş akışı tanımlıdır; depo uzak bir sunucuya gönderilmediği için uzakta çalıştırılmamıştır.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: .NET (kilitli restore, Release build, birim + gerçek PostgreSQL entegrasyon)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: Kilitli restore
+        run: dotnet restore Kulvar.slnx --locked-mode
+      - name: Release build (uyarılar hata)
+        run: dotnet build Kulvar.slnx -c Release --no-restore
+      - name: Birim testleri
+        run: dotnet test --project tests/Kulvar.UnitTests -c Release --no-build
+      - name: Entegrasyon testleri (Testcontainers PostgreSQL 18, kısıtlı runtime rolleri)
+        run: dotnet test --project tests/Kulvar.IntegrationTests -c Release --no-build
+      - name: Bilinen zafiyetli paket taraması
+        run: dotnet list Kulvar.slnx package --vulnerable --include-transitive
+
+  web:
+    name: Web (typecheck, lint, bileşen testleri, üretim build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: src/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Bağımlılık denetimi (yalnız üretim bağımlılıkları)
+        run: npm audit --omit=dev --audit-level=high
+
+  stack:
+    name: Docker yığını (HTTPS) + tarayıcı uçtan uca
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    needs: [backend, web]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: npm
+          cache-dependency-path: src/web/package-lock.json
+      - name: Geliştirici sertifikası (yalnız bu koşu için)
+        run: dotnet dev-certs https
+      - name: İzole yığın (kendi proje adı, portu ve dizini) + demo seed
+        env:
+          # Tek IP'den çok sayıda giriş yapıldığı için hız sınırları yalnız bu tek kullanımlık yığında yükseltilir (scripts/e2e.ps1 ile aynı).
+          KULVAR_LOGIN_LIMIT: "600"
+          KULVAR_SIGNUP_LIMIT: "120"
+        run: |
+          scripts/local-stack.sh init --project kulvar-e2e --local-dir .local-e2e --port 8863 --seed-demo
+          scripts/local-stack.sh up   --project kulvar-e2e --local-dir .local-e2e --port 8863 --seed-demo --simulation
+      - name: Playwright (kurulu Chrome) + axe
+        working-directory: src/web
+        env:
+          KULVAR_E2E_BASE_URL: https://localhost:8863
+          KULVAR_E2E_LOCAL_DIR: ../../.local-e2e
+        run: |
+          npm ci --no-audit --no-fund
+          npm run e2e
+      - name: Loglar (hata durumunda)
+        if: failure()
+        run: scripts/local-stack.sh logs --project kulvar-e2e --local-dir .local-e2e --port 8863
+      - name: Temizlik
+        if: always()
+        run: scripts/local-stack.sh reset --project kulvar-e2e --local-dir .local-e2e --port 8863 --confirm-reset kulvar-e2e

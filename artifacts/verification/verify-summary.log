@@ -1,0 +1,10 @@
+# doğrulama özeti 2026-10-10T21:19:48Z parmak izi: b30967daa618d93e files=210
+dotnet restore --locked-mode	exit=0		1 sn	artifacts/verification/restore.log
+dotnet build -c Release	exit=0		2 sn	artifacts/verification/build.log
+birim testleri	exit=0	toplam=148 geçti=148 başarısız=0 atlandı=0	4 sn	artifacts/verification/unit-tests.log
+entegrasyon testleri (PostgreSQL 18)	exit=0	toplam=212 geçti=212 başarısız=0 atlandı=0	66 sn	artifacts/verification/integration-tests.log
+web: npm ci	exit=0		4 sn	artifacts/verification/web-install.log
+web: typecheck	exit=0		4 sn	artifacts/verification/web-typecheck.log
+web: lint	exit=0		33 sn	artifacts/verification/web-lint.log
+web: bileşen testleri	exit=0	geçti=37	37 sn	artifacts/verification/web-tests.log
+web: üretim build	exit=0		4 sn	artifacts/verification/web-build.log

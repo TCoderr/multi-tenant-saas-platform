@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kulvar — Demo önizleme</title>
+<!--
+  Kulvar statik tasarım önizlemesi (docs/07-ui-design.md). Tek dosya, API'siz, betiksiz; veriler sentetiktir.
+  Nihai arayüz src/web altındaki React uygulamasıdır ve gerçek API'ye bağlıdır. Bu dosya ürün image'ına girmez.
+  Yazı tipi: uygulama IBM Plex Sans / Condensed'i npm paketinden aynı origin'den sunar; bu tek dosyada sistem yedeği kullanılır.
+  Sahibi: TCoderr
+-->
+<style>
+  :root {
+    --paper: #f3f6f4; --surface: #ffffff; --ink: #14261f; --ink-soft: #51615a; --line: #d3dbd6; --line-strong: #9aa8a1;
+    --action: #0f6e5c; --muted-fill: #e7ece9;
+    --ok: #1b6b3a; --ok-bg: #e4f2e8; --warn: #7a5200; --warn-bg: #fbf1d9; --critical: #9f2a1f; --critical-bg: #fbe6e2; --info: #1f4e8c; --info-bg: #e6eef8;
+    --body: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+    --cond: 'IBM Plex Sans Condensed', 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #dfe5e1; color: var(--ink); font: 15px/1.5 var(--body); font-variant-numeric: tabular-nums; }
+  h1, h2, h3, p { margin: 0; }
+  h1 { font-size: 27px; font-weight: 600; line-height: 1.25; }
+  h2 { font-size: 21px; font-weight: 600; }
+  h3 { font-size: 17px; font-weight: 600; }
+  a { color: var(--action); text-underline-offset: 2px; }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+  .sheet { max-width: 1480px; margin: 0 auto; padding: 24px; display: grid; gap: 32px; }
+  .intro { max-width: 760px; display: grid; gap: 8px; }
+  .screen { display: grid; gap: 8px; }
+  .screen__label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font: 600 13px/1.4 var(--cond); color: var(--ink-soft); }
+  .demo { display: inline-block; padding: 0 6px; border: 1px solid var(--warn); border-radius: 4px; background: var(--warn-bg); color: var(--warn); font: 600 13px/1.4 var(--cond); }
+  .frame { background: var(--paper); border: 1px solid var(--line-strong); overflow: hidden; }
+  .frame--360 { width: 360px; }
+  .frame--768 { width: 768px; max-width: 100%; }
+
+  /* Çalışma alanı */
+  .ws { display: grid; grid-template-columns: 48px 220px minmax(0, 1fr); min-height: 560px; }
+  .lane { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px 0; color: #fff; background-color: var(--lane); }
+  .lane__mono { font: 600 17px/1.2 var(--cond); }
+  .lane__pattern { width: 100%; height: 40px; }
+  .lane__name { writing-mode: vertical-rl; font: 500 15px/1 var(--cond); white-space: nowrap; }
+  .lane-a { --lane: #0f5f52; }
+  .lane-a .lane__pattern { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 3px, transparent 3px 9px); }
+  .lane-b { --lane: #1f4e8c; }
+  .lane-b .lane__pattern { background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.55) 0 3px, transparent 3px 9px); }
+  .lane-c { --lane: #7a3b12; }
+  .lane-c .lane__pattern { background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.55) 0 3px, transparent 3px 9px); }
+  .lane-d { --lane: #7b2d3b; }
+  .lane-d .lane__pattern { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.55) 0 3px, transparent 3px 9px); }
+  .lane-e { --lane: #4a5a1c; }
+  .lane-e .lane__pattern { background-image: radial-gradient(rgba(255,255,255,.65) 2px, transparent 2.5px); background-size: 9px 9px; }
+  .lane-f { --lane: #3b4252; }
+  .lane-f .lane__pattern { background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.45) 0 2px, transparent 2px 10px), repeating-linear-gradient(90deg, rgba(255,255,255,.45) 0 2px, transparent 2px 10px); }
+  .nav { display: flex; flex-direction: column; gap: 16px; padding: 14px; background: var(--surface); border-right: 1px solid var(--line); }
+  .nav__head { display: grid; gap: 6px; padding-bottom: 12px; border-bottom: 3px solid var(--lane); }
+  .brand { font: 600 21px/1.2 var(--cond); color: var(--ink); }
+  .nav__company { font-size: 17px; font-weight: 600; line-height: 1.25; }
+  .small { font-size: 13px; } .muted { color: var(--ink-soft); }
+  .nav ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+  .nav li a { display: block; padding: 6px 8px; border-left: 3px solid transparent; color: var(--ink); font-weight: 500; text-decoration: none; }
+  .nav li a[aria-current] { border-left-color: var(--lane); background: var(--paper); font-weight: 600; }
+  .nav__account { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); }
+  .main { min-width: 0; }
+  .content { padding: 24px; display: grid; gap: 16px; max-width: 1180px; }
+  .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .ctx { font: 600 13px/1.4 var(--cond); color: var(--ink-soft); }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+
+  .btn { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); color: var(--ink); font: 500 15px/1.2 var(--body); text-decoration: none; }
+  .btn--primary { background: var(--action); border-color: var(--action); color: #fff; }
+  .btn--danger { border-color: var(--critical); color: var(--critical); }
+  .btn[aria-disabled='true'] { background: var(--muted-fill); border-color: var(--line); color: var(--ink-soft); }
+  .gate { display: inline-grid; gap: 4px; }
+  .gate span { font-size: 13px; color: var(--ink-soft); max-width: 320px; }
+
+  .filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .field { display: grid; gap: 4px; min-width: 140px; }
+  .field label { font-weight: 500; }
+  .field input, .field select, .field textarea { min-height: 36px; padding: 6px 10px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); color: var(--ink); font: inherit; width: 100%; }
+  .field--grow { flex: 1 1 220px; }
+  .field .err { font-size: 13px; font-weight: 500; color: var(--critical); }
+  .field input[aria-invalid='true'] { border: 2px solid var(--critical); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); }
+  th, td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  thead th { font: 600 13px/1.4 var(--cond); color: var(--ink-soft); background: var(--paper); white-space: nowrap; }
+  tbody th { font-weight: 500; }
+  .num { white-space: nowrap; }
+  .badge { display: inline-block; padding: 0 8px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface); font: 600 13px/1.5 var(--cond); white-space: nowrap; }
+  .badge--ok { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+  .badge--warn { border-color: var(--warn); background: var(--warn-bg); color: var(--warn); }
+  .badge--critical { border-color: var(--critical); background: var(--critical-bg); color: var(--critical); }
+  .badge--info { border-color: var(--info); background: var(--info-bg); color: var(--info); }
+  .badge--muted { background: var(--muted-fill); color: var(--ink-soft); }
+
+  .band { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 8px 24px; font-weight: 500; border-bottom: 1px solid; }
+  .band--warn { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); }
+  .band--critical { background: var(--critical-bg); color: var(--critical); border-color: var(--critical); }
+  .band--offline { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .band a { color: inherit; font-weight: 600; }
+  .note { padding: 12px 16px; border: 1px solid var(--line); border-left-width: 4px; border-radius: 4px; background: var(--surface); display: grid; gap: 6px; }
+  .note strong { display: block; }
+  .note--warn { border-color: var(--warn); background: var(--warn-bg); } .note--warn strong { color: var(--warn); }
+  .note--critical { border-color: var(--critical); background: var(--critical-bg); } .note--critical strong { color: var(--critical); }
+  .note--ok { border-color: var(--ok); background: var(--ok-bg); } .note--ok strong { color: var(--ok); }
+  .note--info { border-color: var(--info); background: var(--info-bg); } .note--info strong { color: var(--info); }
+
+  dl.def { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 6px 16px; margin: 0; }
+  dl.def dt { font: 600 13px/1.6 var(--cond); color: var(--ink-soft); }
+  dl.def dd { margin: 0; }
+  .timeline { margin: 0; padding: 0; list-style: none; border-left: 2px solid var(--line); }
+  .timeline li { padding: 8px 0 8px 16px; border-top: 1px solid var(--line); }
+  .timeline li:first-child { border-top: 0; }
+  .timeline .c { background: var(--surface); }
+  .section { padding-top: 20px; border-top: 1px solid var(--line); display: grid; gap: 12px; }
+  .meter { display: grid; gap: 4px; max-width: 480px; }
+  .meter div { display: flex; justify-content: space-between; font-weight: 500; }
+  meter { width: 100%; height: 12px; }
+
+  /* 768: gezinme yatay sekme satırı */
+  .ws--768 { grid-template-columns: 48px minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 420px; }
+  .ws--768 .lane { grid-row: 1 / span 2; }
+  .ws--768 .nav { flex-direction: column; gap: 6px; padding: 10px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .ws--768 .nav__head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding-bottom: 8px; }
+  .ws--768 .nav ul { display: flex; flex-wrap: wrap; gap: 0 4px; }
+  .ws--768 .nav li a { border-left: 0; border-bottom: 3px solid transparent; }
+  .ws--768 .nav li a[aria-current] { border-bottom-color: var(--lane); }
+  .ws--768 .content { padding: 16px; }
+
+  /* 360: şerit üstte yatay bant, tablolar satır kartı */
+  .ws--360 { display: block; min-height: 0; }
+  .ws--360 .lane { flex-direction: row; gap: 10px; height: 48px; padding: 0 12px; }
+  .ws--360 .lane__name { writing-mode: horizontal-tb; font-size: 17px; }
+  .ws--360 .lane__pattern { order: 3; width: 48px; height: 100%; margin-left: auto; }
+  .ws--360 .nav { gap: 6px; padding: 10px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .ws--360 .nav__head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding-bottom: 8px; }
+  .ws--360 .content { padding: 16px; }
+  .ws--360 h1 { font-size: 21px; }
+  .cards { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .cards li { padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); }
+  .cards dl { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 4px 12px; margin: 0; }
+  .cards dt { font: 600 13px/1.6 var(--cond); color: var(--ink-soft); }
+  .cards dd { margin: 0; }
+
+  .topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px; padding: 10px 24px; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .topbar nav { display: flex; flex-wrap: wrap; gap: 4px 20px; font-weight: 500; }
+  .page { padding: 24px; display: grid; gap: 16px; }
+  .narrow { max-width: 480px; }
+  .hero { display: grid; gap: 14px; max-width: 700px; }
+  .hero__lanes { display: flex; gap: 6px; height: 56px; }
+  .hero__lanes span { width: 24px; background-color: var(--lane); }
+  .hero__lanes .lane-a { background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 3px, transparent 3px 9px); }
+  .hero__lanes .lane-b { background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.55) 0 3px, transparent 3px 9px); }
+  .hero__lanes .lane-c { background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.55) 0 3px, transparent 3px 9px); }
+  .hero__lanes .lane-d { background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.55) 0 3px, transparent 3px 9px); }
+  .hero__lanes .lane-e { background-image: radial-gradient(rgba(255,255,255,.65) 2px, transparent 2.5px); background-size: 9px 9px; }
+  .hero__lanes .lane-f { background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.45) 0 2px, transparent 2px 10px), repeating-linear-gradient(90deg, rgba(255,255,255,.45) 0 2px, transparent 2px 10px); }
+  .pair { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+  .tokens { display: flex; flex-wrap: wrap; gap: 8px; }
+  .token { width: 132px; border: 1px solid var(--line-strong); background: var(--surface); font-size: 13px; }
+  .token i { display: block; height: 40px; border-bottom: 1px solid var(--line-strong); }
+  .token span { display: block; padding: 4px 8px; }
+  @media (max-width: 900px) { .ws:not(.ws--768):not(.ws--360) { grid-template-columns: 48px minmax(0, 1fr); } .ws:not(.ws--768):not(.ws--360) .nav { display: none; } }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="intro">
+    <p class="row"><span class="brand">Kulvar</span> <span class="demo">Demo önizleme</span></p>
+    <h1>Arayüz tasarım önizlemesi</h1>
+    <p class="muted">Statik, API'siz tek dosya. Kişi ve şirket adları sentetiktir. Çalışan arayüz <code>src/web</code> altındadır ve gerçek API'ye bağlıdır; bu sayfadaki düğmeler bilerek hiçbir şeye bağlı değildir.</p>
+  </header>
+
+  <section class="screen" aria-labelledby="s-tokens">
+    <div class="screen__label"><span id="s-tokens">Renk, tipografi ve kulvar şeritleri</span> <span class="demo">Demo önizleme</span></div>
+    <div class="frame"><div class="page">
+      <div class="tokens">
+        <div class="token"><i style="background:#f3f6f4"></i><span>Kâğıt #F3F6F4</span></div>
+        <div class="token"><i style="background:#ffffff"></i><span>Yüzey #FFFFFF</span></div>
+        <div class="token"><i style="background:#14261f"></i><span>Mürekkep #14261F</span></div>
+        <div class="token"><i style="background:#51615a"></i><span>Soluk #51615A</span></div>
+        <div class="token"><i style="background:#d3dbd6"></i><span>Çizgi #D3DBD6</span></div>
+        <div class="token"><i style="background:#0f6e5c"></i><span>Eylem #0F6E5C</span></div>
+      </div>
+      <p class="row">
+        <span class="badge badge--ok">✓ Tamam</span><span class="badge badge--warn">! Uyarı</span><span class="badge badge--critical">× Kritik</span><span class="badge badge--info">i Bilgi</span>
+        <span class="muted small">Durum rengi her zaman metinle birlikte kullanılır.</span>
+      </p>
+      <p class="small muted">Ölçek 13 / 15 / 17 / 21 / 27 px · gövde 15 px, satır yüksekliği 1,5 · sayılar tabular · cümle düzeni.</p>
+      <div class="hero__lanes" aria-hidden="true">
+        <span class="lane-a"></span><span class="lane-c"></span><span class="lane-b"></span><span class="lane-d"></span><span class="lane-e"></span><span class="lane-f"></span>
+      </div>
+      <p class="small muted">Altı şerit tonu, her biri kendi çizgi deseniyle: şirket kimliğinden türetilir; renk tek ayırt edici değildir.</p>
+    </div></div>
+  </section>
+
+  <section class="screen" aria-labelledby="s-tickets">
+    <div class="screen__label"><span id="s-tickets">Talepler — 1440 px · /t/:tenantId/tickets</span> <span class="demo">Demo önizleme</span></div>
+    <div class="frame">
+      <div class="ws lane-a">
+        <div class="lane" aria-hidden="true"><span class="lane__mono">AM</span><span class="lane__pattern"></span><span class="lane__name">Akasya Mobilya</span></div>
+        <div class="nav">
+          <div class="nav__head">
+            <span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span>
+            <div class="nav__company">Akasya Mobilya</div>
+            <div class="small muted">Rol: <strong>Admin</strong> · Team (Etkin)</div>
+          </div>
+          <ul>
+            <li><a href="#s-tickets" aria-current="page">Talepler</a></li>
+            <li><a href="#s-tickets">Müşteriler</a></li>
+            <li><a href="#s-tickets">Ekip</a></li>
+            <li><a href="#s-plan">Plan ve kullanım</a></li>
+            <li><a href="#s-tickets">Denetim</a></li>
+            <li><a href="#s-tickets">Dışa aktarma</a></li>
+            <li><a href="#s-tickets">Ayarlar</a></li>
+          </ul>
+          <div class="nav__account small muted">Ali Demir<br><a href="#s-companies">Şirketlerim</a> · <a href="#s-companies">Posta kutusu</a></div>
+        </div>
+        <div class="main">
+          <div class="content">
+            <div class="head">
+              <div><div class="ctx">Akasya Mobilya</div><h1>Talepler</h1></div>
+              <a class="btn btn--primary" href="#s-tickets">Yeni talep</a>
+            </div>
+            <div class="filters">
+              <div class="field"><label for="p-status">Durum</label><select id="p-status"><option>Tümü</option><option>Açık</option><option>İşlemde</option></select></div>
+              <div class="field"><label for="p-priority">Öncelik</label><select id="p-priority"><option>Tümü</option><option>Acil</option></select></div>
+              <div class="field"><label for="p-assignee">Atanan</label><select id="p-assignee"><option>Tümü</option><option>Bana atananlar</option><option>Atanmamış</option></select></div>
+              <div class="field field--grow"><label for="p-q">Başlıkta ara</label><input id="p-q" type="search"></div>
+              <span class="btn">Uygula</span>
+            </div>
+            <table>
+              <caption style="position:absolute;left:-9999px">Talepler</caption>
+              <thead><tr><th scope="col">No</th><th scope="col">Başlık</th><th scope="col">Müşteri</th><th scope="col">Durum</th><th scope="col">Öncelik</th><th scope="col">Atanan</th><th scope="col">Güncelleme</th></tr></thead>
+              <tbody>
+                <tr><td class="num">#7</td><th scope="row"><a href="#s-detail">Teslimat saati değişikliği</a></th><td>İpek Yalçın</td><td><span class="badge badge--ok">Çözüldü</span></td><td><span class="badge">Normal</span></td><td>Aslı Kaya</td><td class="num">10 Eki 2026 14:20</td></tr>
+                <tr><td class="num">#5</td><th scope="row"><a href="#s-detail">Çalışma masası montaj kılavuzu eksik</a></th><td>Hakan Çetin</td><td><span class="badge badge--warn">İşlemde</span></td><td><span class="badge">Normal</span></td><td>Cem Arslan</td><td class="num">10 Eki 2026 11:05</td></tr>
+                <tr><td class="num">#3</td><th scope="row"><a href="#s-detail">Sandalye ayağı kırık geldi</a></th><td>Elif Korkmaz</td><td><span class="badge badge--ok">Çözüldü</span></td><td><span class="badge badge--critical">Acil</span></td><td>Aslı Kaya</td><td class="num">9 Eki 2026 16:42</td></tr>
+                <tr><td class="num">#2</td><th scope="row"><a href="#s-detail">Otel lobisi için 12 koltukluk teklif</a></th><td>Fırat Öztürk</td><td><span class="badge badge--info">Açık</span></td><td><span class="badge">Normal</span></td><td class="muted">Atanmamış</td><td class="num">9 Eki 2026 10:18</td></tr>
+                <tr><td class="num">#1</td><th scope="row"><a href="#s-detail">Yemek masası teslimatı gecikti</a></th><td>Deniz Arslan</td><td><span class="badge badge--warn">İşlemde</span></td><td><span class="badge badge--warn">Yüksek</span></td><td>Aslı Kaya</td><td class="num">8 Eki 2026 09:31</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" aria-labelledby="s-detail">
+    <div class="screen__label"><span id="s-detail">Talep detayı — başka şirket, başka şerit · /t/:tenantId/tickets/:id</span> <span class="demo">Demo önizleme</span></div>
+    <div class="frame">
+      <div class="ws lane-b">
+        <div class="lane" aria-hidden="true"><span class="lane__mono">BY</span><span class="lane__pattern"></span><span class="lane__name">Boreas Yazılım</span></div>
+        <div class="nav">
+          <div class="nav__head">
+            <span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span>
+            <div class="nav__company">Boreas Yazılım</div>
+            <div class="small muted">Rol: <strong>Agent</strong> · Deneme (Deneme)</div>
+          </div>
+          <ul>
+            <li><a href="#s-detail" aria-current="page">Talepler</a></li><li><a href="#s-detail">Müşteriler</a></li><li><a href="#s-detail">Ekip</a></li>
+            <li><a href="#s-plan">Plan ve kullanım</a></li><li><a href="#s-detail">Denetim</a></li><li><a href="#s-detail">Dışa aktarma</a></li><li><a href="#s-detail">Ayarlar</a></li>
+          </ul>
+        </div>
+        <div class="main">
+          <div class="band band--warn"><span>! Ödeme alınamadı. Ödemesiz dönem 17 Ekim 2026 tarihinde biter; sonrasında içerik salt-okunur olur.</span><span>Planı yalnız Owner güncelleyebilir.</span></div>
+          <div class="content">
+            <div class="head">
+              <div><div class="ctx">Boreas Yazılım</div><h1>Raporlar sayfası açılmıyor</h1>
+                <p class="row" style="margin-top:6px"><span class="num muted">#1</span><span class="badge badge--warn">İşlemde</span><span class="badge badge--warn">Öncelik: Yüksek</span></p></div>
+            </div>
+            <p>Aylık rapor ekranı beyaz sayfa veriyor.</p>
+            <dl class="def">
+              <dt>Müşteri</dt><dd><a href="#s-detail">Kerem Aksoy</a></dd>
+              <dt>Atanan</dt><dd>Belma Çelik</dd>
+              <dt>Açılma</dt><dd class="num">8 Eki 2026 09:12</dd>
+            </dl>
+            <div class="section">
+              <h2>Durum</h2>
+              <div class="row" style="align-items:flex-start">
+                <span class="btn">Bırak</span>
+                <span class="btn btn--primary">Çözüldü olarak işaretle</span>
+                <span class="gate"><span class="btn" aria-disabled="true">Düzenle</span><span>Bu talep başka bir üyeye atanmış. Yalnız atanan kişi, Admin veya Owner değiştirebilir.</span></span>
+              </div>
+            </div>
+            <div class="section">
+              <h2>Zaman çizelgesi</h2>
+              <ol class="timeline">
+                <li><div class="small muted">Belma Çelik · 8 Eki 2026 09:12 · olay</div>Talep açıldı</li>
+                <li><div class="small muted">Belma Çelik · 8 Eki 2026 09:14 · olay</div>Durum değişti: Açık → İşlemde</li>
+                <li class="c"><div class="small muted">Belma Çelik · 8 Eki 2026 09:20 · yorum</div>Tarayıcı önbelleği temizlenince düzeldi mi diye soruldu.</li>
+              </ol>
+              <div class="field" style="max-width:640px"><label for="p-comment">Yorum</label><textarea id="p-comment" rows="3"></textarea></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" aria-labelledby="s-plan">
+    <div class="screen__label"><span id="s-plan">Plan ve kullanım — kota ve plan işlemi durumları</span> <span class="demo">Demo önizleme</span></div>
+    <div class="frame">
+      <div class="ws lane-c">
+        <div class="lane" aria-hidden="true"><span class="lane__mono">YT</span><span class="lane__pattern"></span><span class="lane__name">Yolculuk Tekstil</span></div>
+        <div class="nav">
+          <div class="nav__head">
+            <span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span>
+            <div class="nav__company">Yolculuk Tekstil</div>
+            <div class="small muted">Rol: <strong>Owner</strong> · Deneme (Deneme)</div>
+          </div>
+          <ul><li><a href="#s-plan">Talepler</a></li><li><a href="#s-plan">Müşteriler</a></li><li><a href="#s-plan">Ekip</a></li><li><a href="#s-plan" aria-current="page">Plan ve kullanım</a></li><li><a href="#s-plan">Denetim</a></li><li><a href="#s-plan">Dışa aktarma</a></li><li><a href="#s-plan">Ayarlar</a></li></ul>
+        </div>
+        <div class="main">
+          <div class="content">
+            <div><div class="ctx">Yolculuk Tekstil</div><h1>Plan ve kullanım</h1></div>
+            <div class="meter"><div><span>Koltuk</span><span class="num">3 / 3 üye</span></div><meter min="0" max="3" low="2.4" high="2.999" optimum="0" value="3">3 / 3</meter><span class="small" style="color:var(--critical);font-weight:500">Limit doldu.</span></div>
+            <div class="meter"><div><span>Bu dönem açılan talep</span><span class="num">17 / 20 talep</span></div><meter min="0" max="20" low="16" high="19.999" optimum="0" value="17">17 / 20</meter></div>
+            <p class="small muted">Talep kotası 1 Kas 2026 03:00 tarihinde sıfırlanır. Sayaçlar sunucudan gelir.</p>
+            <div class="note note--warn"><strong>Plan değişikliği: Sonuç bekleniyor</strong><span>İstek alındı; ödeme sağlayıcısının sonucu bekleniyor. Plan henüz değişmedi.</span><span class="small muted">İşlem 018f3a2c · ₺490 · durum 2 saniyede bir yenileniyor</span></div>
+            <table>
+              <thead><tr><th scope="col">Plan</th><th scope="col">Aylık ücret</th><th scope="col">Koltuk</th><th scope="col">Aylık talep</th><th scope="col">Dışa aktarma</th><th scope="col">İşlem</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">Deneme <span class="badge badge--info">Geçerli plan</span></th><td>Ücretsiz</td><td class="num">3</td><td class="num">20</td><td>Yok</td><td><span class="gate"><span class="btn" aria-disabled="true">Bu plana geç</span><span>Deneme planına geri dönülemez.</span></span></td></tr>
+                <tr><th scope="row">Starter</th><td class="num">₺490</td><td class="num">5</td><td class="num">200</td><td>Var</td><td><span class="gate"><span class="btn" aria-disabled="true">Bu plana geç</span><span>Sonucu bekleyen bir plan değişikliği var.</span></span></td></tr>
+                <tr><th scope="row">Team</th><td class="num">₺1.490</td><td class="num">25</td><td class="num">2.000</td><td>Var</td><td><span class="gate"><span class="btn" aria-disabled="true">Bu plana geç</span><span>Sonucu bekleyen bir plan değişikliği var.</span></span></td></tr>
+              </tbody>
+            </table>
+            <p class="small muted">Demo: ödeme simüle edilir, gerçek ücret alınmaz ve kart bilgisi istenmez.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" aria-labelledby="s-states">
+    <div class="screen__label"><span id="s-states">Durumlar — her durumun kendi metni ve bir sonraki adımı var</span> <span class="demo">Demo önizleme</span></div>
+    <div class="frame">
+      <div class="band band--offline">⚠ Bağlantı yok. Değişiklikler gönderilmedi; formdaki metniniz korunuyor.</div>
+      <div class="band band--critical"><span>! Abonelik iptal edildi: içerik salt-okunur. Verileriniz duruyor; yazma işlemleri kapalı.</span><a href="#s-plan">Plan seçerek yeniden etkinleştir</a></div>
+      <div class="band band--critical"><span>! Silme bekliyor: bu şirket 9 Kasım 2026 tarihinde kalıcı olarak silinecek. İçerik salt-okunur.</span><a href="#s-states">Silmeyi iptal et</a></div>
+      <div class="page" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+        <div class="note"><strong>Henüz müşteri yok.</strong><span>İlk müşteriyi ekleyin; talepler müşteri kayıtlarına bağlanır.</span></div>
+        <div class="note"><strong>Hizmet geçici olarak kullanılamıyor</strong><span>Verileriniz güvende. Biraz sonra yeniden deneyin.</span><span><span class="btn">Yeniden dene</span></span><span class="small muted">İz kimliği: 00-4bf92f35…-01</span></div>
+        <div class="note note--warn"><strong>Bu kayıt siz düzenlerken değişti</strong><span>Başka biri aynı kaydı güncelledi; değişikliğiniz kaydedilmedi.</span><span class="row"><span class="btn">Güncel sürümü yükle</span><span class="btn">Kendi metnimi koru</span></span></div>
+        <div class="note note--warn"><strong>Bu dönemin talep kotası doldu</strong><span>Kullanılan: <b>20</b> / 20 talep. Kota 1 Kas 2026 03:00 tarihinde sıfırlanır.</span><a href="#s-plan">Planı yükselt</a></div>
+        <div class="note note--warn"><strong>Koltuk limiti dolu</strong><span>Kullanılan koltuk: <b>3</b> / 3. Yeni üye eklemek için plan yükseltilmeli ya da bir koltuk boşaltılmalıdır.</span><span>Planı yalnız Owner değiştirebilir; şirket sahibinize haber verin.</span></div>
+        <div class="note"><strong>Bu içerik için yetkiniz yok</strong><span>Gereken yetki: Owner veya Admin rolü. Rolünüz: Agent.</span></div>
+        <div class="note note--critical"><strong>Şirket askıya alındı</strong><span>Şirketin içeriği askı kalkana kadar kapalıdır; verileriniz silinmedi. (Tam sayfa durum; gezinme gösterilmez.)</span></div>
+        <div class="note note--info"><strong>Davetin süresi dolmuş</strong><span>Yöneticinizden yeni davet isteyin.</span></div>
+        <div class="note note--info"><strong>Oturumunuz sona erdi</strong><span>Kaldığınız yere dönmek için yeniden giriş yapın.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" aria-labelledby="s-companies">
+    <div class="screen__label"><span id="s-companies">Şirketsiz ekranlar — şerit yok: ürün/plan, giriş, şirketlerim, demo posta kutusu</span> <span class="demo">Demo önizleme</span></div>
+    <div class="pair">
+      <div class="frame" style="flex:1 1 560px">
+        <div class="topbar"><span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span><nav aria-label="Genel"><a href="#s-companies">Ürün ve planlar</a><a href="#s-companies">Giriş yap</a><a href="#s-companies">Kayıt ol</a></nav></div>
+        <div class="page">
+          <div class="hero">
+            <h2>Her şirket kendi kulvarında</h2>
+            <p class="muted">Destek ekiplerinin müşteri kayıtlarını ve taleplerini tuttuğu çalışma alanı. Hangi şirkette olduğunuz ekranın kenarındaki şeritten bellidir; bir şirketin verisi diğerine karışmaz.</p>
+            <p class="row"><span class="btn btn--primary">Hesap oluştur</span><span class="btn">Giriş yap</span></p>
+          </div>
+          <table>
+            <thead><tr><th scope="col">Plan</th><th scope="col">Aylık ücret</th><th scope="col">Koltuk</th><th scope="col">Aylık talep</th><th scope="col">Dışa aktarma</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Deneme</th><td>Ücretsiz</td><td class="num">3 üye</td><td class="num">20 talep</td><td>Yok</td></tr>
+              <tr><th scope="row">Starter</th><td class="num">₺490</td><td class="num">5 üye</td><td class="num">200 talep</td><td>Var</td></tr>
+              <tr><th scope="row">Team</th><td class="num">₺1.490</td><td class="num">25 üye</td><td class="num">2.000 talep</td><td>Var</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="frame" style="flex:0 1 420px">
+        <div class="topbar"><span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span></div>
+        <div class="page narrow">
+          <h2>Giriş yap</h2>
+          <div class="note note--critical"><strong>Giriş yapılamadı: eksik alanlar var.</strong></div>
+          <div class="field"><label for="p-email">E-posta</label><input id="p-email" type="email" aria-invalid="true" aria-describedby="p-email-err"><span id="p-email-err" class="err">E-posta adresinizi girin.</span></div>
+          <div class="field"><label for="p-pass">Parola</label><input id="p-pass" type="password"></div>
+          <p><span class="btn btn--primary">Giriş yap</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="pair">
+      <div class="frame" style="flex:1 1 480px">
+        <div class="topbar"><span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span><nav aria-label="Hesap"><a href="#s-companies">Şirketlerim</a><a href="#s-companies">Posta kutusu</a><span class="muted small">Cem Arslan</span></nav></div>
+        <div class="page">
+          <h2>Şirketlerim</h2>
+          <table>
+            <thead><tr><th scope="col">Şirket</th><th scope="col">Rolünüz</th><th scope="col">Durum</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><a href="#s-tickets">Akasya Mobilya</a></th><td>Agent</td><td><span class="badge badge--ok">Etkin</span></td></tr>
+              <tr><th scope="row"><a href="#s-detail">Boreas Yazılım</a></th><td>Admin</td><td><span class="badge badge--ok">Etkin</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="frame" style="flex:1 1 480px">
+        <div class="topbar"><span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span><nav aria-label="Hesap"><a href="#s-companies">Şirketlerim</a><a href="#s-companies">Posta kutusu</a></nav></div>
+        <div class="page">
+          <h2>Posta kutusu</h2>
+          <p class="row"><span class="demo">Demo posta kutusu</span><span class="muted small">Gerçek e-posta gönderilmez; iletiler yalnız burada görünür.</span></p>
+          <table>
+            <thead><tr><th scope="col">Konu</th><th scope="col">Tür</th><th scope="col">Tarih</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><a href="#s-companies">Kulvar: Boreas Yazılım şirketine davet edildiniz</a></th><td>Davet</td><td class="num">8 Eki 2026 09:02</td></tr>
+              <tr><th scope="row"><a href="#s-companies">Kulvar: e-posta adresinizi doğrulayın</a></th><td>E-posta doğrulama</td><td class="num">8 Eki 2026 09:00</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" aria-labelledby="s-narrow">
+    <div class="screen__label"><span id="s-narrow">Dar ekranlar — 768 px: gezinme yatay sekme satırı · 360 px: şerit üstte bant, tablolar satır kartı</span> <span class="demo">Demo önizleme</span></div>
+    <div class="pair">
+      <div class="frame frame--768">
+        <div class="ws ws--768 lane-a">
+          <div class="lane" aria-hidden="true"><span class="lane__mono">AM</span><span class="lane__pattern"></span><span class="lane__name">Akasya Mobilya</span></div>
+          <div class="nav">
+            <div class="nav__head"><span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span><span class="nav__company">Akasya Mobilya</span><span class="small muted">Rol: <strong>Viewer</strong></span></div>
+            <ul><li><a href="#s-narrow">Talepler</a></li><li><a href="#s-narrow" aria-current="page">Müşteriler</a></li><li><a href="#s-narrow">Ekip</a></li><li><a href="#s-narrow">Plan ve kullanım</a></li><li><a href="#s-narrow">Denetim</a></li><li><a href="#s-narrow">Dışa aktarma</a></li><li><a href="#s-narrow">Ayarlar</a></li></ul>
+          </div>
+          <div class="main"><div class="content">
+            <div class="head"><div><div class="ctx">Akasya Mobilya</div><h1>Müşteriler</h1></div>
+              <span class="gate"><span class="btn" aria-disabled="true">Yeni müşteri</span><span>Bu işlem için Owner, Admin veya Agent rolü gerekir. Rolünüz: Viewer.</span></span></div>
+            <p class="small muted">Rolünüz için e-posta ve telefon maskelenir, notlar gösterilmez.</p>
+            <table>
+              <thead><tr><th scope="col">Ad</th><th scope="col">Unvan</th><th scope="col">E-posta</th><th scope="col">Telefon</th></tr></thead>
+              <tbody>
+                <tr><th scope="row"><a href="#s-narrow">Deniz Arslan</a></th><td>Arslan Mimarlık Ltd. Şti.</td><td>d***@musteri-a.test</td><td class="num">*** ** 01</td></tr>
+                <tr><th scope="row"><a href="#s-narrow">Elif Korkmaz</a></th><td>—</td><td>e***@musteri-a.test</td><td class="num">*** ** 02</td></tr>
+              </tbody>
+            </table>
+          </div></div>
+        </div>
+      </div>
+      <div class="frame frame--360">
+        <div class="ws ws--360 lane-b">
+          <div class="lane" aria-hidden="true"><span class="lane__mono">BY</span><span class="lane__name">Boreas Yazılım</span><span class="lane__pattern"></span></div>
+          <div class="nav">
+            <div class="nav__head"><span class="row"><span class="brand">Kulvar</span><span class="demo">Demo</span></span><span class="small muted">Rol: <strong>Admin</strong></span><span class="btn" style="margin-left:auto;min-height:30px;padding:2px 10px;font-size:13px">Menü</span></div>
+          </div>
+          <div class="content">
+            <div><div class="ctx">Boreas Yazılım</div><h1>Talepler</h1></div>
+            <ul class="cards">
+              <li><dl><dt>No</dt><dd class="num">#3</dd><dt>Başlık</dt><dd><a href="#s-narrow">Barkod okuyucu tanınmıyor</a></dd><dt>Müşteri</dt><dd>Mert Kaplan</dd><dt>Durum</dt><dd><span class="badge badge--ok">Çözüldü</span></dd><dt>Öncelik</dt><dd><span class="badge badge--critical">Acil</span></dd></dl></li>
+              <li><dl><dt>No</dt><dd class="num">#1</dd><dt>Başlık</dt><dd><a href="#s-narrow">Raporlar sayfası açılmıyor</a></dd><dt>Müşteri</dt><dd>Kerem Aksoy</dd><dt>Durum</dt><dd><span class="badge badge--warn">İşlemde</span></dd><dt>Öncelik</dt><dd><span class="badge badge--warn">Yüksek</span></dd></dl></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="small muted">Kulvar — <span class="demo">Demo önizleme</span> · Gerçek e-posta, SMS veya ödeme gönderilmez; görünen tüm kişi ve şirket verileri sentetiktir. Sahibi: TCoderr.</footer>
+</div>
+</body>
+</html>

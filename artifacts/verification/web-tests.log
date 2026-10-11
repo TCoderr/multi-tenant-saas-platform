@@ -1,0 +1,11 @@
+﻿npm notice run kulvar-web@0.1.0 test
+npm notice run node node_modules/vitest/vitest.mjs run
+
+ RUN  v5.0.3 D:/Multi-Tenant SaaS Platform/multi-tenant-saas-platform/src/web
+
+
+ Test Files  5 passed (5)
+      Tests  37 passed (37)
+   Start at  00:19:08
+   Duration  34.99s (environment 75%, setup 12%, tests 6%, import 6%, transform 1%)
+

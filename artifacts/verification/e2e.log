@@ -1,0 +1,163 @@
+Sıfırlandı: 'kulvar-e2e' yığınının 0 volume'u silindi. Yerel sırlar (.local-e2e) korunur.
+Hazır: .local-e2e (secrets, certs, seed). Değerler ekrana yazılmadı.
+#1 [internal] load local bake definitions
+#1 reading from stdin 576B 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 3.10kB done
+#2 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 DONE 0.6s
+
+#4 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#4 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#4 CACHED
+
+#5 [internal] load metadata for mcr.microsoft.com/dotnet/sdk:10.0.401
+#5 ...
+
+#6 [internal] load metadata for mcr.microsoft.com/dotnet/aspnet:10.0.12
+#6 DONE 0.3s
+
+#5 [internal] load metadata for mcr.microsoft.com/dotnet/sdk:10.0.401
+#5 DONE 0.3s
+
+#7 [internal] load metadata for docker.io/library/node:24.18.0-bookworm-slim
+#7 DONE 0.6s
+
+#8 [internal] load .dockerignore
+#8 transferring context: 255B done
+#8 DONE 0.0s
+
+#9 [build  1/14] FROM mcr.microsoft.com/dotnet/sdk:10.0.401@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317
+#9 resolve mcr.microsoft.com/dotnet/sdk:10.0.401@sha256:e70cdb7f80b0348f5cb85f19a8f670fca061f033d57eed12fa003d58b0e06317 0.0s done
+#9 DONE 0.0s
+
+#10 [web 1/6] FROM docker.io/library/node:24.18.0-bookworm-slim@sha256:6f7b03f7c2c8e2e784dcf9295400527b9b1270fd37b7e9a7285cf83b6951452d
+#10 resolve docker.io/library/node:24.18.0-bookworm-slim@sha256:6f7b03f7c2c8e2e784dcf9295400527b9b1270fd37b7e9a7285cf83b6951452d 0.0s done
+#10 DONE 0.0s
+
+#11 [runtime 1/5] FROM mcr.microsoft.com/dotnet/aspnet:10.0.12@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4
+#11 resolve mcr.microsoft.com/dotnet/aspnet:10.0.12@sha256:222759b391a1aaf241166672c8f99b2d4ada452e7b5319f3c6e8f265a37b5ad4 0.0s done
+#11 DONE 0.0s
+
+#12 [internal] load build context
+#12 transferring context: 11.00kB 0.0s done
+#12 DONE 0.0s
+
+#13 [build  8/14] COPY src/Kulvar.Modules.Customers/Kulvar.Modules.Customers.csproj src/Kulvar.Modules.Customers/packages.lock.json src/Kulvar.Modules.Customers/
+#13 CACHED
+
+#14 [build 10/14] COPY src/Kulvar.Modules.Billing/Kulvar.Modules.Billing.csproj src/Kulvar.Modules.Billing/packages.lock.json src/Kulvar.Modules.Billing/
+#14 CACHED
+
+#15 [build 11/14] COPY src/Kulvar.Modules.Operations/Kulvar.Modules.Operations.csproj src/Kulvar.Modules.Operations/packages.lock.json src/Kulvar.Modules.Operations/
+#15 CACHED
+
+#16 [build  2/14] WORKDIR /src
+#16 CACHED
+
+#17 [build  3/14] COPY global.json Directory.Build.props Directory.Packages.props ./
+#17 CACHED
+
+#18 [runtime 4/5] COPY --from=build --chown=root:root /app/publish/ ./
+#18 CACHED
+
+#19 [web 4/6] RUN npm ci --no-audit --no-fund
+#19 CACHED
+
+#20 [build  7/14] COPY src/Kulvar.Modules.Tenancy/Kulvar.Modules.Tenancy.csproj src/Kulvar.Modules.Tenancy/packages.lock.json src/Kulvar.Modules.Tenancy/
+#20 CACHED
+
+#21 [web 3/6] COPY src/web/package.json src/web/package-lock.json ./
+#21 CACHED
+
+#22 [build 14/14] RUN dotnet publish src/Kulvar.Api/Kulvar.Api.csproj -c Release -o /app/publish --no-restore -p:UseAppHost=false
+#22 CACHED
+
+#23 [build  5/14] COPY src/Kulvar.Platform/Kulvar.Platform.csproj src/Kulvar.Platform/packages.lock.json src/Kulvar.Platform/
+#23 CACHED
+
+#24 [build  6/14] COPY src/Kulvar.Modules.Identity/Kulvar.Modules.Identity.csproj src/Kulvar.Modules.Identity/packages.lock.json src/Kulvar.Modules.Identity/
+#24 CACHED
+
+#25 [web 5/6] COPY src/web/ ./
+#25 CACHED
+
+#26 [runtime 2/5] WORKDIR /app
+#26 CACHED
+
+#27 [build  9/14] COPY src/Kulvar.Modules.Support/Kulvar.Modules.Support.csproj src/Kulvar.Modules.Support/packages.lock.json src/Kulvar.Modules.Support/
+#27 CACHED
+
+#28 [web 6/6] RUN npm run build
+#28 CACHED
+
+#29 [build  4/14] COPY src/Kulvar.Api/Kulvar.Api.csproj src/Kulvar.Api/packages.lock.json src/Kulvar.Api/
+#29 CACHED
+
+#30 [runtime 3/5] RUN mkdir -p /var/lib/kulvar/dataprotection /var/lib/kulvar/exports     && chown -R "1654" /var/lib/kulvar     && chmod 0700 /var/lib/kulvar/dataprotection /var/lib/kulvar/exports
+#30 CACHED
+
+#31 [build 12/14] RUN dotnet restore src/Kulvar.Api/Kulvar.Api.csproj --locked-mode
+#31 CACHED
+
+#32 [build 13/14] COPY src/ src/
+#32 CACHED
+
+#33 [web 2/6] WORKDIR /web
+#33 CACHED
+
+#34 [runtime 5/5] COPY --from=web --chown=root:root /web/dist/ ./wwwroot/
+#34 CACHED
+
+#35 exporting to image
+#35 exporting layers done
+#35 exporting manifest sha256:df8221fd9d8acb92fb4cdfcacd4e1556953903c232a7790e2736dc94b4ec1d34 done
+#35 exporting config sha256:092cf67328a51e1c4b6065a7115ed564015dc07b1334ab7d64e5c424382de374 done
+#35 exporting attestation manifest sha256:a6bf0198f5c6d6a264f95697c32e0777e2a3efc62aa618870765103d5278b0f7
+#35 exporting attestation manifest sha256:a6bf0198f5c6d6a264f95697c32e0777e2a3efc62aa618870765103d5278b0f7 0.0s done
+#35 exporting manifest list sha256:02acb7d3e463bc16020138b477ceb86602f4f64477ba9d793634fa764ead955c done
+#35 naming to docker.io/library/kulvar:local done
+#35 unpacking to docker.io/library/kulvar:local done
+#35 DONE 0.1s
+
+#36 resolving provenance for metadata file
+#36 DONE 0.0s
+NAME                    IMAGE           COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+kulvar-e2e-api-1        kulvar:local    "dotnet Kulvar.Api.d…"   api        13 seconds ago   Up 5 seconds (healthy)    127.0.0.1:8863->8843/tcp
+kulvar-e2e-postgres-1   postgres:18.6   "docker-entrypoint.s…"   postgres   14 seconds ago   Up 13 seconds (healthy)   5432/tcp
+kulvar-e2e-worker-1     kulvar:local    "dotnet Kulvar.Api.d…"   worker     13 seconds ago   Up 5 seconds (healthy)    8843/tcp
+{"Timestamp":"2026-10-10T21:22:51.972Z","EventId":0,"LogLevel":"Information","Category":"Kulvar.Seed","Message":"Demo seed tamam: 8 kullan\u0131c\u0131, 2 \u015Firket","State":{"Users":8,"Tenants":2,"{OriginalFormat}":"Demo seed tamam: {Users} kullan\u0131c\u0131, {Tenants} \u015Firket"}}
+Demo verisi hazır. Hesap/şirket eşlemesi README'de; parolalar .local-e2e\seed altında (özel).
+Kulvar: https://localhost:8863
+
+Running 21 tests using 1 worker
+
+  ✓   1 e2e\a11y.spec.ts:52:1 › herkese açık ekranlar: ürün/plan, giriş, kayıt (4.4s)
+  ✓   2 e2e\a11y.spec.ts:72:1 › hesap ekranları: şirketlerim ve demo posta kutusu (2.5s)
+  ✓   3 e2e\a11y.spec.ts:83:1 › çalışma alanı ekranları: müşteri, talep, ekip, plan, denetim, dışa aktarma, ayarlar (15.1s)
+  ✓   4 e2e\a11y.spec.ts:138:1 › rol şeffaflığı ve durum ekranları: Viewer görünümü, yetkisiz sayfa, bulunamayan şirket (3.7s)
+  ✓   5 e2e\a11y.spec.ts:154:1 › platform ekranı (1.7s)
+  ✓   6 e2e\a11y.spec.ts:162:1 › klavye turu: atlama bağlantısı, odak halkası, sayfa değişiminde odak, iletişim kutusu, form hatası, dar ekran menüsü (800ms)
+  ✓   7 e2e\isolation.spec.ts:12:1 › iki şirketin üyesi her şirkette yalnız o şirketin verisini görür (758ms)
+  ✓   8 e2e\isolation.spec.ts:52:1 › başka şirketin adresi "bulunamadı" verir; kimlik tahmini veri sızdırmaz (750ms)
+  ✓   9 e2e\isolation.spec.ts:84:1 › iki sekme iki şirket: yenileme ve gezinme sekmeleri karıştırmaz (1.9s)
+  ✓  10 e2e\isolation.spec.ts:110:1 › A şirketinin geç gelen yanıtı B ekranına düşmez (1.1s)
+  ✓  11 e2e\isolation.spec.ts:146:1 › çıkıştan sonra aynı tarayıcıda giren ikinci kullanıcı öncekinin verisini görmez (634ms)
+  ✓  12 e2e\journey.spec.ts:8:1 › yeni kullanıcı kayıttan dışa aktarmaya kadar tüm yolu tamamlar (10.8s)
+  ✓  13 e2e\platform.spec.ts:19:1 › operatör şirket metadata’sını görür; müşteri ve talep içeriğine ulaşamaz (568ms)
+  ✓  14 e2e\platform.spec.ts:48:1 › operatör olmayan kullanıcı için platform ekranı ve uçları yoktur (443ms)
+  ✓  15 e2e\platform.spec.ts:60:1 › askıya alınan şirket üyeler için tam sayfa kapanır; yeniden etkinleştirince açılır (1.4s)
+  ✓  16 e2e\platform.spec.ts:118:1 › simüle yenileme hatası Owner’a sarı bant olarak görünür; yenilenince kalkar (9.5s)
+  ✓  17 e2e\revocation.spec.ts:7:1 › rol düşürme ve üyelikten çıkarma açık oturuma hemen yansır (4.3s)
+  ✓  18 e2e\roles.spec.ts:6:1 › Viewer: içerik okunur, kişisel veri maskeli, yazma eylemleri nedenli devre dışı (637ms)
+  ✓  19 e2e\roles.spec.ts:42:1 › Agent: müşteri ve talep işleri açık; ekip, plan, denetim ve dışa aktarma yönetimi kapalı (645ms)
+  ✓  20 e2e\roles.spec.ts:77:1 › Admin: ekip ve denetim açık; plan değişikliği, dışa aktarma ve şirket silme yalnız Owner’da (574ms)
+  ✓  21 e2e\roles.spec.ts:106:1 › Owner: tüm yönetim eylemleri açık; koltuğu dolu şirkette davet formu limiti gösterir (616ms)
+
+  21 passed (1.1m)
+Sıfırlandı: 'kulvar-e2e' yığınının 3 volume'u silindi. Yerel sırlar (.local-e2e) korunur.
+E2E sonucu: geçen=21 başarısız=0 kararsız=0 atlanan=0 süre=104 sn
