@@ -29,7 +29,16 @@ local_path="$root/$local_dir"
 demo_users="ayse.owner ali.admin asli.agent arda.viewer burak.owner belma.agent cem.ortak operator"
 
 new_secret() { head -c "${1:-24}" /dev/urandom | base64 | tr '+/' 'AB' | tr -d '=\n'; }
-write_secret() { printf '%s' "$2" > "$1"; chmod 600 "$1" 2>/dev/null || true; }   # sonda satır sonu yok
+# Compose, dosya tabanlı secret'ları ve bağlanan dizinleri host'taki sahiplik ve izinlerle bağlar; container süreçleri (postgres, uygulama
+# image'ının root olmayan kullanıcısı) host kullanıcısından farklı bir uid ile çalışır ve Linux'ta 0600 dosyayı okuyamaz (Windows/macOS
+# bağlamaları izinleri uygulamadığı için orada görünmez). Bu yüzden dosyalar 0644'tür; host'taki diğer kullanıcılara karşı koruma,
+# yerel dizinin kökünün 0700 olmasıdır (protect_local_dir).
+write_secret() { printf '%s' "$2" > "$1"; chmod 644 "$1" 2>/dev/null || true; }   # sonda satır sonu yok
+protect_local_dir() {
+  chmod 700 "$local_path" 2>/dev/null || true
+  chmod 755 "$local_path/secrets" "$local_path/certs" "$local_path/seed" 2>/dev/null || true
+  find "$local_path/secrets" "$local_path/certs" "$local_path/seed" -type f -exec chmod 644 {} + 2>/dev/null || true
+}
 ensure_secret() { local path="$local_path/secrets/$1"; [ -f "$path" ] || write_secret "$path" "$(new_secret "${2:-24}")"; cat "$path"; }
 compose_env() { export KULVAR_LOCAL_DIR="./${local_dir#./}" KULVAR_HTTPS_PORT="$port" KULVAR_SIMULATION="$simulation"; }
 assert_initialized() { [ -f "$local_path/secrets/app_connection" ] || { echo "Önce: scripts/local-stack.sh init --local-dir $local_dir" >&2; exit 1; }; }
@@ -62,6 +71,7 @@ case "$action" in
         [ -f "$path" ] || write_secret "$path" "Kv!$(new_secret 15)aA9"
       done
     fi
+    protect_local_dir   # önceki bir init'in 0600 bıraktığı dosyaları ve dışa aktarılan sertifikayı da kapsar
     echo "Hazır: $local_dir. Değerler ekrana yazılmadı."
     ;;
   up)

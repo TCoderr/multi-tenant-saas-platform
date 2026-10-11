@@ -1,4 +1,4 @@
-# Kulvar CI. Not: bu iş akışı tanımlıdır; depo uzak bir sunucuya gönderilmediği için uzakta çalıştırılmamıştır.
+# Kulvar CI. Yerel doğrulama betikleri (scripts/*.ps1) ile aynı adımlar; uzak koşuların sonucu için Actions sayfasına bakın.
 name: ci
 
 on:
@@ -92,9 +92,16 @@ jobs:
         run: |
           npm ci --no-audit --no-fund
           npm run e2e
-      - name: Loglar (hata durumunda)
+      - name: Teşhis (hata durumunda) - container durumları ve loglar
         if: failure()
-        run: scripts/local-stack.sh logs --project kulvar-e2e --local-dir .local-e2e --port 8863
+        run: |
+          scripts/local-stack.sh status --project kulvar-e2e --local-dir .local-e2e --port 8863 || true
+          # Yalnız State alanları (çıkış kodu, OOMKilled, hata); ortam değişkenleri ve secret içerikleri yazdırılmaz.
+          docker ps -aq --filter "label=com.docker.compose.project=kulvar-e2e" \
+            | xargs -r docker inspect --format '{{.Name}} status={{.State.Status}} exit={{.State.ExitCode}} oomKilled={{.State.OOMKilled}} restarts={{.RestartCount}} error={{.State.Error}}' || true
+          # Yerel dizindeki dosyaların yalnız adı, sahibi ve izinleri (içerik değil).
+          find .local-e2e -maxdepth 2 -exec stat -c '%a %u:%g %n' {} + || true
+          scripts/local-stack.sh logs --project kulvar-e2e --local-dir .local-e2e --port 8863
       - name: Temizlik
         if: always()
         run: scripts/local-stack.sh reset --project kulvar-e2e --local-dir .local-e2e --port 8863 --confirm-reset kulvar-e2e
