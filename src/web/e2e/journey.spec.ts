@@ -11,6 +11,7 @@ test('yeni kullanıcı kayıttan dışa aktarmaya kadar tüm yolu tamamlar', asy
   const password = `Kv!${randomUUID()}`; // Koşuya özel sentetik parola; hiçbir yere yazdırılmaz.
   const company = `Yolculuk ${suffix}`;
   let tenantId = '';
+  let customerId = '';
 
   await test.step('ürün sayfası planları API’den gösterir ve Demo etiketi görünür', async () => {
     await page.goto('/');
@@ -63,13 +64,22 @@ test('yeni kullanıcı kayıttan dışa aktarmaya kadar tüm yolu tamamlar', asy
     await page.getByLabel(/^E-posta/).fill(`zeynep.${suffix}@musteri-deneme.test`);
     await page.getByLabel(/^Telefon/).fill('+90 555 030 03 01');
     await page.getByRole('button', { name: 'Müşteriyi kaydet' }).click();
+    await expect(page).toHaveURL(new RegExp(`/t/${tenantId}/customers/[0-9a-f-]{36}$`));
+    customerId = /\/customers\/([0-9a-f-]{36})$/.exec(page.url())![1]!;
     await expect(page.getByRole('heading', { level: 1, name: 'Zeynep Deneme' })).toBeVisible();
     await expect(page.getByText('Bu müşterinin talebi yok.')).toBeVisible();
   });
 
   await test.step('talep açılır, yorum eklenir, durum ilerler', async () => {
+    // Gezinme ertelenmiş işlenir: adres hemen değişir, ekran sonra gelir. Alan rolü ve tam adıyla seçilir; "Müşteri" alt dizesi
+    // müşteri ekranındaki "Müşteri bilgileri" bölgesiyle de eşleşir. Seçici, ayrılınan ekranda hiçbir öğeyle eşleşmemelidir.
+    const customerField = page.getByRole('combobox', { name: 'Müşteri', exact: true });
+    await expect(customerField).toHaveCount(0);
     await page.getByRole('link', { name: 'Bu müşteri için talep aç' }).click();
-    await expect(page.getByLabel('Müşteri')).toHaveValue(/[0-9a-f-]{36}/);
+    await expect(page).toHaveURL(new RegExp(`/t/${tenantId}/tickets/new\\?customerId=${customerId}$`));
+    await expect(page.getByRole('heading', { level: 1, name: 'Yeni talep' })).toBeVisible();
+    await expect(customerField).toHaveValue(customerId);
+    await expect(customerField.locator('option:checked')).toHaveText('Zeynep Deneme — Deneme Tekstil Ltd. Şti.');
     await page.getByLabel('Başlık').fill('Kumaş teslimatı eksik geldi');
     await page.getByLabel('Açıklama').fill('40 top yerine 36 top teslim edildi.');
     await page.getByLabel('Öncelik').selectOption('High');
@@ -78,6 +88,10 @@ test('yeni kullanıcı kayıttan dışa aktarmaya kadar tüm yolu tamamlar', asy
     await expect(page.getByText('#1', { exact: true })).toBeVisible();
     const header = page.locator('.page-head');
     await expect(header.getByText('Açık', { exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Talep bilgileri' }).getByRole('link', { name: 'Zeynep Deneme' })).toHaveAttribute(
+      'href',
+      `/t/${tenantId}/customers/${customerId}`,
+    );
 
     const comment = page.getByRole('textbox', { name: 'Yorum' });
     await comment.fill('Depo sayımı istendi.');
